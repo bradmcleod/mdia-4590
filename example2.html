@@ -1,0 +1,150 @@
+<html>
+    <head>
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <!--  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css"> -->
+        <link rel="stylesheet" href="./lib/onsenui/css/onsenui.css"> 
+        <!-- <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css"> -->
+        <link rel="stylesheet" href="./lib/onsenui/css/onsen-css-components.min.css">
+        <!--  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script> -->     
+        <script src="./lib/onsenui/js/onsenui.min.js"></script>    
+
+        <link rel="stylesheet" type="text/css" href="css/common.css">
+
+        <script type="text/javascript" src="./js/messagedata.js"></script>    
+
+<!-- Note the change to locally stored dependency files -->
+        <link rel="stylesheet" href="">        
+        <link rel="stylesheet" href="">
+        <script src=""></script>
+
+        <link rel="stylesheet" type="text/css" href="css/common.css">
+
+<!-- The data is being pulled from an external JS file (arrays for the time being) -->
+        <script type="text/javascript" src=""></script>        
+    </head>
+    <body>
+
+        <ons-page>
+            <ons-toolbar>
+                <div class="center">Messages</div>
+                <div class="right">
+                    <ons-toolbar-button id="home-button"> 
+                        <ons-icon icon="md-home"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+            </ons-toolbar>               
+            
+            <ons-pull-hook id="pull-message-check" class="message-refresh" height="150px" threshold-height="125px">
+                Pull to check for new messages
+            </ons-pull-hook>
+
+
+            <!-- the list of messages, populated ons.ready and added to from hook -->
+            <ons-list id="message-list">
+            </ons-list>
+        </ons-page>
+        
+        <!-- ******************** SCRIPT BLOCKS ******************** -->
+        <script type="text/javascript" src="cordova.js"></script>  
+        
+        <script>
+            // home button functionality
+            document.querySelector('#home-button').onclick = function() {                    
+                window.location = './index.html';
+            }; 
+
+            // fires after the app is initialized 
+            ons.ready(function() {
+
+                // generate the starting messages
+                // ** Note this function exist inside the messagedata.js
+
+                var messageSet = genStartSet();
+
+                // the list element
+                var myMessageList = document.getElementById('message-list');
+
+                // since we aren't using lazy-list we can just add items normall7
+                for(let i = 0; i < messageSet.length; i++){
+                    myMessageList.appendChild(
+                        ons.createElement(
+                            formMessageListCode(messageSet[i])
+                        )
+                    );
+                }
+
+                var pullHook = document.getElementById('pull-message-check');
+
+                pullHook.addEventListener('changestate', function(event) {
+                    var message = '';
+
+                    switch(event.state) {
+                    case 'initial':
+                        message = 'Pull to check for new message';
+                        break;
+                    case 'preaction':
+                        message = 'Release';
+                        break;
+                    case 'action':
+                    message = '<div class="pull-spinner"><ons-icon icon="md-spinner" class="pull-spinner-icon" spin></ons-icon>Loading. ..</div>';
+                    break;
+
+                }
+
+                pullHook.innerHTML = message;
+
+            });
+
+                pullHook.onAction = function(done) {
+                    setTimeout(function(){checkForMessages(done)}, 1000)
+                };
+
+            });
+
+            function formMessageListCode(msg){
+
+                // since we'll use this in two places it makes sense to create a separate function
+                return '<ons-list-item>' + 
+                    '<div class="message-list-item">' + 
+                    '<div class="message-list-heading">' + msg.msgFrom.first + msg.msgFrom.last + '</div>' +
+                    '<div class="message-list-subhead">' + msg.msgContent + '</div>' + 
+                    '<div class="message-list-subhead">' + msg.msgDate.toDateString() + ' ' + msg.msgDate.toLocaleTimeString()   + '</div>' + 
+                    '<div class="message-list-right">' +
+                    '<div class="message-list-left">' + 
+                    '<img class="message-list-thumb message-list-thumb-unread" badge="7" src="./img/avatars/' + msg.msgFrom.iconImage + '">' +
+                    '</div>' +
+                    '<div class="message-list-subhead"><span class="message-list-unread"></span></div>' + 
+                    '</div></div></ons-list-item>'
+            }
+
+            function checkForMessages(done){
+                if(Math.random() < .5){
+                    var myMessageList = document.getElementById('message-list');
+
+                    var newMsg = genNewMsg(null,true);
+
+                    myMessageList.prepend(
+                        ons.createElement(
+                            formMessageListCode(newMsg)
+                            )
+                        );
+
+                    ons.notification.toast('1 new message', { timeout: 2000, animation: 'fade'})
+                }
+                else{
+                    ons.notification.toast('No new messages', { timeout: 2000, animation: 'fade'})
+                }
+
+                done();
+            }
+
+        </script>
+    </body>
+</html>
+
+
+

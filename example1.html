@@ -1,0 +1,138 @@
+<html>
+    <head>
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <!-- Security Problem: -->
+        <!-- CND references to base OnSen Framwork  -->
+        <!--  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css"> -->
+        <link rel="stylesheet" href="./lib/onsenui/css/onsenui.css"> 
+        <!-- <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css"> -->
+        <link rel="stylesheet" href="./lib/onsenui/css/onsen-css-components.min.css">
+        <!--  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script> -->     
+        <script src="./lib/onsenui/js/onsenui.min.js"></script>        
+    </head>
+    <body>
+        <ons-navigator swipeable id="myNavigator" page="main-temp"></ons-navigator>
+        <!-- Easily in Section  -->
+        <template id="main-temp">
+            <ons-page id="main-page">
+                <ons-toolbar>
+                    <div class="center">Main</div>
+
+                    <div class="right">
+                        <ons-toolbar-button id="home-button"> 
+                            <ons-icon icon="md-home"></ons-icon>
+                        </ons-toolbar-button>
+                    </div>
+                </ons-toolbar>
+
+                <ons-list-header>Flower List</ons-list-header>                
+                
+
+               
+                <!-- <ons-list-item>
+                    <div class="left">
+                        <img class="list-item__thumbnail" src="./img/flowers/flower-01-md.png">
+                    </div>
+                    <div class="center">
+                        <span class="list-item__title">Flower 1</span><span class="list-item__subtitle">It's a flower</span>
+                    </div>
+                    <div class="right">                        
+                        <ons-button icon="md-caret-right"></ons-button>
+                    </div>
+    
+                </ons-list-item> -->
+
+                <!-- Step1: Generate a Static lists to populate with dynamic content: flower-data.js,
+                     utilizing lazy loading lists (appending list-items as user scrolls down) -->
+
+                <ons-list>
+                    <ons-lazy-repeat id="dynamic-list"></ons-lazy-repeat>
+                </ons-list>
+
+                
+            </ons-page>
+        </template>
+
+        <!-- Single page webview: single flower template -->
+        <template id="single-temp">
+            <ons-page id="single-page">
+                <ons-toolbar>
+                    <div class="left"><ons-back-button>Back</ons-back-button></div>
+                    <div class="center"></div>
+                </ons-toolbar>
+
+                <ons-card>
+                    <div><img style="max-width: 100%;" id="singleImg"></div>
+                    <div class="title" id="singleTitle"></div>
+                    <div class="content" id="singleContent"></div>
+                </ons-card>
+            </ons-page>
+        </template>
+
+
+        
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="./js/flower-data.js"></script>
+
+        <script>
+            // Event manager or other functionality that should wait until the page init has completed
+            document.addEventListener('init', function(event) {     
+                    // get areference to the element (page that the init event)   
+                var page = event.target;           
+
+
+
+                 // home button is only on the main page
+                 if(page.id === 'main-page'){
+                        page.querySelector('#home-button').onclick = function() {
+                        window.location = './index.html';
+                    }; 
+                } 
+
+                if(page.id === 'single-page'){
+                    // set the toolbar center item to show the page.data.title
+                    // remeber that when we pushed tha page we added cFlower as a data member
+                    page.querySelector('ons-toolbar .center').innerHTML = page.data.cFlower.title;
+
+                    // S=set the other elements
+                    page.querySelector('#singleImg').src = page.data.cFlower.path;
+                    page.querySelector('#singleTitle').innerHTML = page.data.cFlower.title;
+                    page.querySelector('#singleContent').innerHTML = page.data.cFlower.desc;
+                }
+            }); 
+            
+            ons.ready(function(){
+                var dynList = document.getElementById('dynamic-list');
+
+                dynList.delegate = {
+                    createItemContent: function(i, template){
+                        return ons.createElement(
+                            '<ons-list-item>' + 
+                                '<div class = "left"><img class="list-item__thumbnail" src ="' + 
+                                flowerData[i].path + '"></div>' +
+                                '<div class="center"><span class="list-item__title">' + flowerData[i].title +
+                                    '</span><span class="list-item__subtitle">' + flowerData[i].desc + '</span></div>' +
+                                    '<div class="right"><ons-button onclick="pushSingleView(' + i +')" icon="md-caret-right"></ons-button></div>' + '</ons-list-item>'
+
+                        );
+                    },
+                    countItems: function(){
+                        return flowerData.length;
+                    }
+                };
+                dynList.refresh();
+            });
+
+            // Step 3: single item - when an item button is selected, we parse the data for that one item and "Push" a single view(stack)
+            function pushSingleView(fIndex){
+                var currFlower = flowerData[Number.parseInt(fIndex)];
+                document.querySelector('#myNavigator').pushPage('single-temp', {data: {cFlower: currFlower}});
+            }
+        </script>
+
+    </body>
+</html>

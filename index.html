@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+
+        <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+        <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+        <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="css/common.css">        
+    </head>
+    <body>
+        <ons-page>
+            <ons-toolbar>
+                <div class="center">MDIA 4295 - Week 3</div>                
+            </ons-toolbar>         
+
+            <div class="head-icon">
+                <img src="./img/bcit4295.png">
+            </div>
+
+            <div class="content-item">
+
+            </div>
+
+            <div class="content-item">
+                <ons-button class="btn-link" data-src="example1.html" onclick="navPage(this)">Example 1</ons-button>
+                <div>Stacking navigation and lists</div>
+            </div>
+
+            <div class="content-item">
+                <ons-button class="btn-link" data-src="example2.html" onclick="navPage(this)">Example 2</ons-button>
+                <div>Pull hooks and toasts.</div>
+            </div>           
+            
+        </ons-page>
+        
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+
+        <script>
+
+            function navPage(target){
+                window.location = event.target.getAttribute('data-src');
+            }            
+
+        </script>
+    </body>
+</html>
